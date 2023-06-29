@@ -6,36 +6,28 @@ import {
   MRT_PaginationState,
   MRT_SortingState,
 } from 'mantine-react-table';
-import { ActionIcon, Box, Button, LoadingOverlay, Modal, Text, Tooltip } from '@mantine/core';
-import { apiGetMenu, apiUserList } from '../../../api';
+import { ActionIcon, Box, Button, LoadingOverlay, Modal, Text, Tooltip, useMantineColorScheme } from '@mantine/core';
+import { apiGetMenu, apiUserList, apiUserRole } from '../../../api';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Irole, MenuItem, MenuProps } from '../../../interface/Irole';
 import { RoleForm } from './RoleForm';
 
 type UserApiResponse = {
-  data: Array<User>;
+  data: Array<Irole>;
   meta: {
     totalRowCount: number;
   };
-};
-
-type User = {
-  id:string;
-  email: string;
-  name: string;
-  realname: string;
-  idcard: string;
-  phone: string;
 };
 
 
 
 export default function RoleIndex(){
     
-  
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
   //data and fetching state
-  const [data, setData] = useState<User[]>([]);
+  const [data, setData] = useState<Irole[]>([]);
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefetching, setIsRefetching] = useState(false);
@@ -51,6 +43,9 @@ export default function RoleIndex(){
       desc: "",
     });
 
+    // 定义单个菜单集合
+    
+  const [menuId, setMenuId] = useState<string[]>([]);
   // 定义表单标题
   const [formTitle, setFormTitle] = useState("");
 //   const
@@ -88,7 +83,7 @@ export default function RoleIndex(){
       }
       try {
        
-        const goodsCategoryDataResponese = await apiUserList(paginations, "GET");
+        const goodsCategoryDataResponese = await apiUserRole(paginations, "GET");
         console.log(goodsCategoryDataResponese.data.data.data)
         setData(goodsCategoryDataResponese.data.data.data);
         setRowCount(goodsCategoryDataResponese.data.data.total);
@@ -134,52 +129,41 @@ export default function RoleIndex(){
     sorting,
   ]);
 
-  const columns = useMemo<MRT_ColumnDef<User>[]>(
+  const columns = useMemo<MRT_ColumnDef<Irole>[]>(
     () => [
       {
         accessorKey: 'id',
         header: '编号',
       },{
-        accessorKey: 'email',
-        header: '账号',
+        accessorKey: 'role_name',
+        header: '角色名称',
       },
       //column definitions...
       {
-        accessorKey: 'name',
-        header: ' 名称',
-      },
-      {
-        accessorKey: 'phone',
-        header: '手机号',
-      },
-      {
-        accessorKey: 'idcard',
-        header: '身份证号',
-      },
-      {
-        accessorKey: 'realname',
-        header: '真实姓名',
-      },
+        accessorKey: 'desc',
+        header: ' 角色简介',
+      }
+     
       //end
     ],
     [],
   );
-
+const callbackHandle=()=>{
+  ajaxGetData();
+  closeRoleForm();
+}
   return (
     <Box p={20} w="100%">
     <LoadingOverlay visible={visible} overlayBlur={2} />
     <MantineReactTable
       columns={columns}
       data={data}
-      getRowId={(row) => row.phone}
+      getRowId={(row) => row.id}
       initialState={{ showColumnFilters: true,
         columnOrder: [
         "id",
-        "name",
-        "email",
-        "phone",
-        "idcard",
-        "realname",
+        "role_name",
+        "desc",
         "mrt-row-actions",
       ], }}
       manualFiltering
@@ -230,17 +214,17 @@ export default function RoleIndex(){
       )}
       renderTopToolbarCustomActions={() => (
         <Button
-          color="dark.4"
-          variant="filled"
+          color={dark?'blue':'dark'}
+          variant="outline"
           onClick={() => openRoleFormHandler("create")}
         >
-         添加用户
+         添加用户角色
         </Button>
       )}
       
     />
-     <Modal opened={RoleFormStatus} onClose={closeRoleForm}  title={<Text fw={700}>{formTitle}</Text>}>
-           <RoleForm  MenuItem={MenuItem}/>
+     <Modal opened={RoleFormStatus} size='xl' onClose={closeRoleForm}  title={<Text fw={700}>{formTitle}</Text>}>
+           <RoleForm callback={callbackHandle} roleItem={roleItem} menuIdArr={menuId} MenuItem={MenuItem}/>
       </Modal>
     </Box>
   );

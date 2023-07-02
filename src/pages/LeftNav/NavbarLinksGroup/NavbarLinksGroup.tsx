@@ -193,7 +193,7 @@ export function LinksGroup({ icon: Icon, label, initiallyOpened, links, link, su
         </Group>
       </UnstyledButton>
       }
-      {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
+      {hasLinks ? <Collapse my={2} in={opened}>{items}</Collapse> : null}
     </>
   );
 }

@@ -3,3 +3,9 @@ export interface ApiResponse {
     msg: string;
     data: any;
   }
+
+  
+export interface SelectPullDown {
+  value: string,
+  label: string
+}

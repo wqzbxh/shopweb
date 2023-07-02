@@ -6,13 +6,15 @@ import { useState } from "react";
 
 interface IndeterminateCheckboxProps {
   items: MenuItem[];
+  menuId:string[];
   callback:(value: string[]) => void;
 }
 export function IndeterminateCheckbox({
   items,
+  menuId,
   callback,
 }: IndeterminateCheckboxProps) {
-  const [menuid, setMenuId] = useState<string[]>([]);
+  const [menuid, setMenuId] = useState<string[]>(menuId);
   const handlerSelect = (value: string[]) => {
     setMenuId(value);
     callback(value);

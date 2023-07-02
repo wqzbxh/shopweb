@@ -303,12 +303,6 @@ export default function GoodGategory() {
   );
 }
 
-interface Props {
-  columns: MRT_ColumnDef<ApiDataGoodsCategory>[];
-  onClose: () => void;
-  onSubmit: (values: ApiDataGoodsCategory) => void;
-  open: boolean;
-}
 
 const validateRequired = (value: string) => !!value.length;
 const validateEmail = (email: string) =>

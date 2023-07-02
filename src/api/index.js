@@ -25,9 +25,11 @@ export const apiGoodsCategory= (data,method) => ajax(Host+'goods_category',data,
 // 用户列表
 export const apiUserList= (data,method) => ajax(Host+'user',data,method,false)
 // 用户列表
+export const apiUser= (data,method) => ajax(Host+'user',data,method,false)
+// 用户列表
 export const apiGetMenu= (data,method) => ajax(Host+'get_menu',data,method,false)
 // 用户角色
 export const apiUserRole= (data,method) => ajax(Host+'user_role',data,method,false)
-// 用户列表
-export const apiUserRoleList= (data,method) => ajax(Host+'user',data,method,false)
 
+// 商品规格类型
+export const apiGoodsType= (data,method) => ajax(Host+'goods_type',data,method,false)

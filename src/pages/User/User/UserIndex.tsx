@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   MantineReactTable,
   MRT_ColumnDef,
@@ -7,52 +7,65 @@ import {
   MRT_SortingState,
 } from 'mantine-react-table';
 import { ActionIcon, Box, Button, LoadingOverlay, Modal, Text, Tooltip, useMantineColorScheme } from '@mantine/core';
-import { apiGetMenu, apiUserList, apiUserRole } from '../../../api';
-import { IconCheck, IconEdit, IconTrash, IconX } from '@tabler/icons-react';
+import { apiUser, apiUserList } from '../../../api';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
+import UserForm from './UserForm';
 import { useDisclosure } from '@mantine/hooks';
-import { Irole, MenuItem, MenuProps } from '../../../interface/Irole';
-import { RoleForm } from './RoleForm';
+import { Iuser } from '../../../interface/Iuser';
+import { getAllRoleSelect } from '../../../utils/AccessInformation';
+import { SelectPullDown } from '../../../interface/Icommon';
 import { DaleteData, HintInfo } from '../../../utils/function';
-import { notifications } from '@mantine/notifications';
 
 
-export default function RoleIndex(){
-    
+type User = {
+  id:string;
+  email: string;
+  name: string;
+  realname: string;
+  idcard: string;
+  phone: string;
+};
+
+const UserIndex = () => {
+  
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
   //data and fetching state
-  const [data, setData] = useState<Irole[]>([]);
+  const [data, setData] = useState<User[]>([]);
+  // 数据加载失败显示隐藏
   const [isError, setIsError] = useState(false);
+  //等待条
   const [isLoading, setIsLoading] = useState(false);
+  // 加载条显示
   const [isRefetching, setIsRefetching] = useState(false);
   const [rowCount, setRowCount] = useState(0);
+    const [RoleSelect, setRoleSelect] = useState<SelectPullDown[]>([]);
+  // 打开用户编辑添加框
+  const [UserFormStatus, {open:openUserForm,close:closeUserForm}] = useDisclosure(false);
   
-  const [RoleFormStatus, {open:openRoleForm,close:closeRoleForm}] = useDisclosure(false);
-  // 定义角色单条数据
-  const [roleItem, SetRoleItem] =
-    useState<Irole>({
-      id: "",
-      menu_id: [],
-      role_name: "",
-      desc: "",
-    });
-
-    // 定义单个菜单集合
-    
-  const [menuId, setMenuId] = useState<string[]>([]);
+  const [visible, setVisible] = useState(false);
   // 定义表单标题
   const [formTitle, setFormTitle] = useState("");
-//   const
-  const [MenuItem, SetMenuItem] = useState<MenuItem[]>([]);
-
-  const [visible, setVisible] = useState(false);
   //table state
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     [],
   );
   const [globalFilter, setGlobalFilter] = useState('');
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
-  
+  // 定义传入表单的初始化数据
+  // 定义角色单条数据
+  const [userItem, SetUserItem] =
+    useState<Iuser>({
+      id: "",
+      name: "",
+      password:"",
+      role_id:"",
+      email:"",
+      confirm_password:"",
+      realname:"",
+      idcard:"",
+      status:'1',
+    });
 
   const [pagination, setPagination] = useState<MRT_PaginationState>({
     pageIndex: 0,
@@ -67,7 +80,7 @@ export default function RoleIndex(){
       } else {
         setIsRefetching(true);
       }
-    
+
      const paginations =  {
         start:  `${pagination.pageIndex * pagination.pageSize}`,
         size: `${pagination.pageSize}`,
@@ -76,10 +89,11 @@ export default function RoleIndex(){
         sorting:  JSON.stringify(sorting ?? []),
       }
       try {
-        const UserRoleesponese = await apiUserRole(paginations, "GET");
-        console.log(UserRoleesponese.data.data.data)
-        setData(UserRoleesponese.data.data.data);
-        setRowCount(UserRoleesponese.data.data.total);
+       
+        const goodsCategoryDataResponese = await apiUserList(paginations, "GET");
+        console.log(goodsCategoryDataResponese.data.data.data)
+        setData(goodsCategoryDataResponese.data.data.data);
+        setRowCount(goodsCategoryDataResponese.data.data.total);
       } catch (error) {
         setIsError(true);
         console.error(error);
@@ -89,40 +103,7 @@ export default function RoleIndex(){
       setIsLoading(false);
       setIsRefetching(false);
       };
-    // 定义打开编辑
-    const editData = (row:Irole)=>{
-        SetRoleItem(row);
-        setFormTitle("编辑用户角色(ID:" + row.id + ")");
-        setMenuId(row.menu_id)
-        getMenuInfo();
-        openRoleForm()
-     
-    };  
-        // 打开添加类型模态框
-  const openRoleFormHandler =  (value: string) => {
-    if (value == "create")
-    SetRoleItem({
-        id: "",
-        menu_id: [],
-        role_name: "",
-        desc: "",
-      });
-    getMenuInfo();
-    setFormTitle("新建角色类型");
-  };
-
-  // 请求菜单信息
-  const getMenuInfo =async()=>{
-    const MenuResponese = await apiGetMenu({}, "GET");
-    console.log(MenuResponese.data.data)
-    if(MenuResponese.data.code === 200 ){
-        SetMenuItem(MenuResponese.data.data)
-        openRoleForm();
-    }else{
-        //准备失败
-    }
-
-  }
+    
   //if you want to avoid useEffect, look at the React Query example instead
   useEffect(() => {
     ajaxGetData();
@@ -135,52 +116,92 @@ export default function RoleIndex(){
     sorting,
   ]);
 
-  const columns = useMemo<MRT_ColumnDef<Irole>[]>(
+    // 打开添加类型模态框
+  const openUserFormHandler =  async (value: string) => {
+      if (value == "create")
+      SetUserItem({
+          id: "",
+          name: "",
+          password:"",
+          confirm_password:"",
+          email:"",
+          realname:"",
+          role_id:"",
+          idcard:"",
+          status:'1',
+        });
+      const RoleSeletOption =  await getAllRoleSelect({type:'select'});
+      setRoleSelect(RoleSeletOption.data)
+      setFormTitle("新建用户");
+      openUserForm()
+    };
+// 表单操作后的回调
+  const callbackHandle=()=>{
+    ajaxGetData();
+    closeUserForm();
+  }
+
+  const editData = async(row:any)=>{
+    SetUserItem(row);
+    const RoleSeletOption =  await getAllRoleSelect({type:'select'});
+    setRoleSelect(RoleSeletOption.data)
+    setFormTitle("编辑用户信息(ID:" + row.id + ")");
+    openUserForm()
+};  
+const handleDeleteRow = (row: any) => {
+  const Info = <Text size='md' color='dark'>用户：{row.name}</Text>;
+  DaleteData(Info, async () => {    // 调用异步请求的逻辑
+    const response = await apiUser({id:row.id}, "DELETE");
+    const result = response.data; // 返回请求结果
+    if(HintInfo(result)) ajaxGetData();
+  });
+};
+  const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
       {
         accessorKey: 'id',
         header: '编号',
       },{
-        accessorKey: 'role_name',
-        header: '角色名称',
+        accessorKey: 'email',
+        header: '账号',
       },
       //column definitions...
       {
-        accessorKey: 'desc',
-        header: ' 角色简介',
-      }
-     
+        accessorKey: 'name',
+        header: ' 名称',
+      },
+      {
+        accessorKey: 'phone',
+        header: '手机号',
+      },
+      {
+        accessorKey: 'idcard',
+        header: '身份证号',
+      },
+      {
+        accessorKey: 'realname',
+        header: '真实姓名',
+      },
       //end
     ],
     [],
   );
 
-    
-const handleDeleteRow = (row: Irole) => {
-  const Info = <Text>用户角色：{row.role_name}</Text>;
-  DaleteData(Info, async () => {    // 调用异步请求的逻辑
-    const response = await apiUserRole({id:row.id}, "DELETE");
-    const result = response.data; // 返回请求结果
-    if(HintInfo(result)) ajaxGetData();
-  });
-};
-
-const callbackHandle=()=>{
-  ajaxGetData();
-  closeRoleForm();
-}
   return (
     <Box p={20} w="100%">
     <LoadingOverlay visible={visible} overlayBlur={2} />
     <MantineReactTable
       columns={columns}
       data={data}
-      getRowId={(row) => row.id}
+      getRowId={(row) => row.phone}
       initialState={{ showColumnFilters: true,
         columnOrder: [
         "id",
-        "role_name",
-        "desc",
+        "name",
+        "email",
+        "phone",
+        "idcard",
+        "realname",
         "mrt-row-actions",
       ], }}
       manualFiltering
@@ -233,16 +254,19 @@ const callbackHandle=()=>{
         <Button
           color={dark?'blue':'dark'}
           variant="outline"
-          onClick={() => openRoleFormHandler("create")}
+          onClick={() => openUserFormHandler("create")}
         >
-         添加用户角色
+         添加用户
         </Button>
       )}
-      
     />
-     <Modal opened={RoleFormStatus} size='xl' onClose={closeRoleForm}  title={<Text fw={700}>{formTitle}</Text>}>
-           <RoleForm callback={callbackHandle} roleItem={roleItem} menuIdArr={menuId} MenuItem={MenuItem}/>
+    
+    
+    <Modal opened={UserFormStatus} size='xl' onClose={closeUserForm}  title={<Text fw={700}>{formTitle}</Text>}>
+           <UserForm RoleSelect={RoleSelect} callback={callbackHandle} infoItem={userItem} />
       </Modal>
     </Box>
   );
 };
+
+export default UserIndex;

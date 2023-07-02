@@ -1,9 +1,9 @@
 import { useForm } from '@mantine/form';
-import { Box, TextInput, NumberInput, Button, Group, Textarea, Text, LoadingOverlay } from '@mantine/core';
+import { Box, TextInput, NumberInput, Button, Group, Textarea, Text, LoadingOverlay, Code, useMantineColorScheme } from '@mantine/core';
 import { IndeterminateCheckbox } from './RoleSelect';
 import { Irole, MenuItem } from '../../../interface/Irole';
 import { FormEvent, useState } from 'react';
-import { IconCheck, IconX } from '@tabler/icons-react';
+import { IconCheck, IconPlus, IconSquarePlus, IconX } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { apiGoodsCategory, apiUserRole } from '../../../api';
 
@@ -14,7 +14,11 @@ interface IMenuItemProps{
     callback:(value:any)=>void
 }
 export  function RoleForm({callback,roleItem,MenuItem,menuIdArr}:IMenuItemProps) {
+  
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
   //定义加载器
+  console.log(roleItem,'22')
   const [visible, setVisible] = useState(false);
   const [menuId, setMenuId] = useState<string[]>(menuIdArr);
   const form = useForm<Irole>({
@@ -70,10 +74,11 @@ export  function RoleForm({callback,roleItem,MenuItem,menuIdArr}:IMenuItemProps)
   return (
     <Box>
     <LoadingOverlay visible={visible} overlayBlur={2} />
+  
       <form onSubmit={handleFormSubmit}>
         <TextInput label="角色名称"
         w={200}
-        placeholder="角色名称" {...form.getInputProps('role_name')} />
+        placeholder="最少两位" {...form.getInputProps('role_name')} />
 
       <Textarea
         placeholder="角色职责描述"
@@ -88,9 +93,11 @@ export  function RoleForm({callback,roleItem,MenuItem,menuIdArr}:IMenuItemProps)
        <Text fw={400} size='0.9rem' mt={5}>
         菜单选择
       </Text>
-        <IndeterminateCheckbox callback={setMenuIdCallback} items={MenuItem} />
+        <IndeterminateCheckbox callback={setMenuIdCallback} menuId={menuId} items={MenuItem} />
         <Group position="right" mt="md">
-          <Button type="submit">Submit</Button>
+          <Button 
+          color={dark?'blue':'dark'}
+          variant="outline" leftIcon={<IconPlus/>}   type="submit">保存</Button>
         </Group>
       </form>
     </Box>

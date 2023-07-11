@@ -103,8 +103,8 @@ export default function HeaderSearch({ links }: HeaderSearchProps) {
       const response = await apiLogout();
       const result = response.data;
       if (result.code === 200 || result.code === 20014) {
-        localstorageUnits.saveUser({});
-        navigate('/login');
+          localstorageUnits.saveUser({});
+          navigate('/login');
           notifications.show({
               title: 'Hint',
               color: 'green',

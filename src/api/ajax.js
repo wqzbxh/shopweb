@@ -91,11 +91,12 @@ export default function ajax(url, data = {}, type = 'GET', isContainsFiles = fal
       }
       promise.then(response => {
          if(response.data.code === 0){
+           window.location.href="/login"
             notifications.show({
                title:response.data.msg,
                color: 'yellow.7',
                icon: <IconX/>,
-               message: '登录信息异常，请退出重新登录',
+               message: '登录信息异常，请退出重新登录1',
            })
          }
          resolve(response);

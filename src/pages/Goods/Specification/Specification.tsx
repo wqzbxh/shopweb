@@ -7,7 +7,7 @@ import {
   MRT_SortingState,
 } from 'mantine-react-table';
 import { ActionIcon, Box, Button, LoadingOverlay, Modal, Text, Tooltip, useMantineColorScheme } from '@mantine/core';
-import { apiUser, apiUserList } from '../../../api';
+import { apiGoodsType, apiUser, apiUserList } from '../../../api';
 import { Icon123, IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Iuser } from '../../../interface/Iuser';
@@ -15,23 +15,15 @@ import { getAllRoleSelect } from '../../../utils/AccessInformation';
 import { SelectPullDown } from '../../../interface/Icommon';
 import { DaleteData, HintInfo } from '../../../utils/function';
 import SpecificationForm from './SpecificationForm';
+import { ISpecification } from '../../../interface/Ispecification';
 
-
-type User = {
-  id:string;
-  email: string;
-  name: string;
-  realname: string;
-  idcard: string;
-  phone: string;
-};
 
 const Specification = () => {
   
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
   //data and fetching state
-  const [data, setData] = useState<User[]>([]);
+  const [data, setData] = useState<ISpecification[]>([]);
   // 数据加载失败显示隐藏
   const [isError, setIsError] = useState(false);
   //等待条
@@ -90,7 +82,7 @@ const Specification = () => {
       }
       try {
        
-        const goodsCategoryDataResponese = await apiUserList(paginations, "GET");
+        const goodsCategoryDataResponese = await apiGoodsType(paginations, "GET");
         console.log(goodsCategoryDataResponese.data.data.data)
         setData(goodsCategoryDataResponese.data.data.data);
         setRowCount(goodsCategoryDataResponese.data.data.total);
@@ -155,37 +147,38 @@ const handleDeleteRow = (row: any) => {
     const result = response.data; // 返回请求结果
     if(HintInfo(result)) ajaxGetData();
   });
-};
-  const columns = useMemo<MRT_ColumnDef<User>[]>(
-    () => [
-      {
-        accessorKey: 'id',
-        header: '编号',
-      },{
-        accessorKey: 'email',
-        header: '账号',
+};const columns = useMemo<MRT_ColumnDef<ISpecification>[]>(
+  () => [
+    {
+      accessorKey: 'filteredAttributesItem',
+      header: '属性集合',
+      Cell: ({ row }) => {
+        const attributes = row.original.filteredAttributesItem;
+        return (
+          <ul>
+            {attributes.map((attribute) => (
+              <li key={attribute.id}>
+                {attribute.attr_name}: {attribute.attr_val}
+              </li>
+            ))}
+          </ul>
+        );
       },
-      //column definitions...
-      {
-        accessorKey: 'name',
-        header: ' 名称',
-      },
-      {
-        accessorKey: 'phone',
-        header: '手机号',
-      },
-      {
-        accessorKey: 'idcard',
-        header: '身份证号',
-      },
-      {
-        accessorKey: 'realname',
-        header: '真实姓名',
-      },
-      //end
-    ],
-    [],
-  );
+    },
+    // 其他列定义...
+    {
+      accessorKey: 'name',
+      header: '规格名字',
+    },
+    // 其他列定义...
+    {
+      accessorKey: 'created_at',
+      header: '创建时间',
+    },
+    // 其他列定义...
+  ],
+  []
+);
 
   return (
     <Box p={20} w="100%">
@@ -193,15 +186,11 @@ const handleDeleteRow = (row: any) => {
     <MantineReactTable
       columns={columns}
       data={data}
-      getRowId={(row) => row.phone}
       initialState={{ showColumnFilters: true,
         columnOrder: [
-        "id",
         "name",
-        "email",
-        "phone",
-        "idcard",
-        "realname",
+        "filteredAttributesItem",
+        "created_at",
         "mrt-row-actions",
       ], }}
       manualFiltering

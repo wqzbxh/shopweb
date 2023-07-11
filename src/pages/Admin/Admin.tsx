@@ -9,12 +9,20 @@ import Specification from "../Goods/Specification/Specification";
 import HeaderSearch from "../Headernav/HeaderNav";
 import Home from "../Home/Home";
 import { Left } from "../LeftNav/LeftNav";
+import Login from "../Login/Login";
 import RoleIndex from "../User/Role/RoleIndex";
 import UserIndex from "../User/User/UserIndex";
 
 function Admin() {
-  
+
   const [routePath, setRoutePath] = useState("");
+  const navigate = useNavigate();
+  const userid = memoryUtils.user.user_id;
+  console.log(userid)
+  if(!userid)
+  {
+    return <Login/>
+  }
   const callBread = () => {
     let storagePath = localstorageUnits.getPath();
     if (storagePath && Object.keys(storagePath).length > 0) {
@@ -23,7 +31,6 @@ function Admin() {
     }
   };
   
-  const navigate = useNavigate();
 
     const links = [
         {

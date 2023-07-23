@@ -33,3 +33,9 @@ export const apiUserRole= (data,method) => ajax(Host+'user_role',data,method,fal
 
 // 商品规格类型
 export const apiGoodsType= (data,method) => ajax(Host+'goods_type',data,method,false)
+// 商品规格类型属性参数
+export const apiGoodsTypeAttribute= (data,method) => ajax(Host+'goods_type_attribute',data,method,false)
+
+
+export const apiTimeTracker= (data,method) => ajax(Host+'time_project',data,method,false)
+

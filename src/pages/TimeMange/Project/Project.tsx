@@ -9,13 +9,13 @@ import {
 import { ActionIcon, Box, Button, LoadingOverlay, Modal, Text, Tooltip, useMantineColorScheme } from '@mantine/core';
 import { apiUser, apiUserList } from '../../../api';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
-import UserForm from '../../User/User/UserForm';
+
 import { useDisclosure } from '@mantine/hooks';
 import { Iuser } from '../../../interface/Iuser';
+import { getAllRoleSelect } from '../../../utils/AccessInformation';
 import { SelectPullDown } from '../../../interface/Icommon';
 import { DaleteData, HintInfo } from '../../../utils/function';
-import GoodsForm from './GoodsForm';
-import { getAllGoodCategory, getAllGoodsType } from '../../../utils/AccessInformation';
+import ProjectForm from './ProjectForm';
 
 
 type User = {
@@ -27,7 +27,7 @@ type User = {
   phone: string;
 };
 
-const Goods = () => {
+const Project = () => {
   
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
@@ -40,10 +40,9 @@ const Goods = () => {
   // 加载条显示
   const [isRefetching, setIsRefetching] = useState(false);
   const [rowCount, setRowCount] = useState(0);
-  const [goodsCateGorySelect, setgoodsCateGorySelect] = useState<SelectPullDown[]>([]);
-  const [goodsTypeSelect, setgoodsTypeSelect] = useState<SelectPullDown[]>([]);
+    const [RoleSelect, setRoleSelect] = useState<SelectPullDown[]>([]);
   // 打开用户编辑添加框
-  const [GoodsFormStatus, {open:openGoodsForm,close:closeGoddsForm}] = useDisclosure(false);
+  const [UserFormStatus, {open:openUserForm,close:closeUserForm}] = useDisclosure(false);
   
   const [visible, setVisible] = useState(false);
   // 定义表单标题
@@ -119,7 +118,7 @@ const Goods = () => {
   ]);
 
     // 打开添加类型模态框
-  const openGoodsFormHandler =  async (value: string) => {
+  const openUserFormHandler =  async (value: string) => {
       if (value == "create")
       SetUserItem({
           id: "",
@@ -132,33 +131,23 @@ const Goods = () => {
           idcard:"",
           status:'1',
         });
-      setFormTitle("新建商品");
-      openGoodsForm();
-      const GoodCategoryOption =  await getAllGoodCategory({type:'select'});
-      const GoodsTypeOption =  await getAllGoodsType({type:'select'});
-      const SetlectGoodCategoryOption =  GoodCategoryOption.map((item:any,index:any)=>{
-      return {   value:item.id, label:item.category_name,  }
-    })
-    const SetlectGoodsTypeOption =  GoodsTypeOption.map((item:any,index:any)=>{
-       return {
-         value:item.id,
-         label:item.name,
-       }
-     })
-      setgoodsTypeSelect(SetlectGoodsTypeOption);
-      setgoodsCateGorySelect(SetlectGoodCategoryOption);
- 
+      const RoleSeletOption =  await getAllRoleSelect({type:'select'});
+      setRoleSelect(RoleSeletOption.data)
+      setFormTitle("新建记录项目");
+      openUserForm()
     };
 // 表单操作后的回调
   const callbackHandle=()=>{
     ajaxGetData();
-    closeGoddsForm();
+    closeUserForm();
   }
 
   const editData = async(row:any)=>{
     SetUserItem(row);
+    const RoleSeletOption =  await getAllRoleSelect({type:'select'});
+    setRoleSelect(RoleSeletOption.data)
     setFormTitle("编辑用户信息(ID:" + row.id + ")");
-    openGoodsForm()
+    openUserForm()
 };  
 const handleDeleteRow = (row: any) => {
   const Info = <Text size='md' color='dark'>用户：{row.name}</Text>;
@@ -198,113 +187,87 @@ const handleDeleteRow = (row: any) => {
     ],
     [],
   );
-
+ 
   return (
     <Box p={20} w="100%">
-      <LoadingOverlay visible={visible} overlayBlur={2} />
-      <MantineReactTable
-        columns={columns}
-        data={data}
-        getRowId={(row) => row.phone}
-        initialState={{
-          showColumnFilters: true,
-          columnOrder: [
-            "id",
-            "name",
-            "email",
-            "phone",
-            "idcard",
-            "realname",
-            "mrt-row-actions",
-          ],
-        }}
-        manualFiltering
-        manualPagination
-        manualSorting
-        displayColumnDefOptions={{
-          "mrt-row-actions": {
-            header: "操作", //change header text
-          },
-        }}
-        mantineToolbarAlertBannerProps={
-          isError
-            ? {
-                color: "red",
-                children: "Error loading data",
-              }
-            : undefined
-        }
-        enablePinning
-        onColumnFiltersChange={setColumnFilters}
-        onGlobalFilterChange={setGlobalFilter}
-        onPaginationChange={setPagination}
-        onSortingChange={setSorting}
-        rowCount={rowCount}
-        enableEditing
-        state={{
-          columnFilters,
-          globalFilter,
-          isLoading,
-          pagination,
-          showAlertBanner: isError,
-          showProgressBars: isRefetching,
-          sorting,
-        }}
-        renderRowActions={({ cell, row, table }) => (
-          <Box sx={{ display: "flex", gap: "16px" }}>
-            <Tooltip
-              withArrow
-              position="left"
-              label="Edit"
-              onClick={() => editData(row.original)}
-            >
-              <ActionIcon>
-                <IconEdit size="1.2rem" slope={1.5} />
-              </ActionIcon>
-            </Tooltip>
-            <Tooltip
-              withArrow
-              position="right"
-              label="Delete"
-              onClick={() => handleDeleteRow(row.original)}
-            >
-              <ActionIcon color="red">
-                <IconTrash size="1.2rem" slope={1.5} />
-              </ActionIcon>
-            </Tooltip>
-          </Box>
-        )}
-        renderTopToolbarCustomActions={() => (
-          <Button
-            color={dark ? "blue" : "dark"}
-            variant="outline"
-            onClick={() => openGoodsFormHandler("create")}
-          >
-            添加商品
-          </Button>
-        )}
-      />
-
-      <Modal
-        opened={GoodsFormStatus}
-        size="xl"
-        fullScreen
-        transitionProps={{ transition: 'fade', duration: 200 }}
-        onClose={closeGoddsForm}
-        title={<Text fw={700}>{formTitle}</Text>}
-      >
-        
     <LoadingOverlay visible={visible} overlayBlur={2} />
-  
-        {/* <GoodsForm goodsCateGorySelect={goodsCateGorySelect} callback={callbackHandle} infoItem={userItem} /> */}
-        <GoodsForm
-          goodsCategory={goodsCateGorySelect}
-          callback={callbackHandle}
-          goodsTypeSelect={goodsTypeSelect}
-        />
+    <MantineReactTable
+      columns={columns}
+      data={data}
+      getRowId={(row) => row.phone}
+      initialState={{ showColumnFilters: true,
+        columnOrder: [
+        "id",
+        "name",
+        "email",
+        "phone",
+        "idcard",
+        "realname",
+        "mrt-row-actions",
+      ], }}
+      manualFiltering
+      manualPagination
+      manualSorting
+      displayColumnDefOptions={{
+        'mrt-row-actions': {
+          header: '操作', //change header text
+        },
+      }}
+      mantineToolbarAlertBannerProps={
+        isError
+          ? {
+              color: 'red',
+              children: 'Error loading data',
+            }
+          : undefined
+      }
+      enablePinning
+      onColumnFiltersChange={setColumnFilters}
+      onGlobalFilterChange={setGlobalFilter}
+      onPaginationChange={setPagination}
+      onSortingChange={setSorting}
+      rowCount={rowCount}
+      enableEditing
+      state={{
+        columnFilters,
+        globalFilter,
+        isLoading,
+        pagination,
+        showAlertBanner: isError,
+        showProgressBars: isRefetching,
+        sorting,
+      }}
+      renderRowActions={({ cell, row, table }) => (
+        <Box sx={{ display: "flex", gap: "16px" }}>
+          <Tooltip withArrow position="left" label="Edit" onClick={() => editData(row.original)}>
+            <ActionIcon >
+              <IconEdit size="1.2rem" slope={1.5} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip withArrow position="right" label="Delete" onClick={() =>handleDeleteRow(row.original)}>
+            <ActionIcon color="red" >
+              <IconTrash size="1.2rem" slope={1.5} />
+            </ActionIcon>
+          </Tooltip>
+        </Box>
+      )}
+      renderTopToolbarCustomActions={() => (
+        <Button
+          color={dark?'blue':'dark'}
+          variant="outline"
+          onClick={() => openUserFormHandler("create")}
+        >
+         添加记录项目
+        </Button>
+      )}
+    />
+    
+
+    <Modal opened={UserFormStatus} size='xs' onClose={closeUserForm}  title={<Text fw={700}>{formTitle}</Text>}>
+           <ProjectForm  callback={callbackHandle}/>
       </Modal>
     </Box>
   );
 };
 
-export default Goods;
+export default Project;

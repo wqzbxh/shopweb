@@ -31,7 +31,7 @@ export const HintInfo=(result: { code: number; msg: any; })=>{
   
     }else {
     notifications.show({
-      title: "Login Error",
+      title: "来自服务器的错误提示",
       color: "red",
       icon: <IconX />,
       message: result.msg,
@@ -42,4 +42,40 @@ export const HintInfo=(result: { code: number; msg: any; })=>{
 }
 
 
-// 
+// 客户端警告  客户端警告
+export const ClientWarningHint =(errors:any)=>{
+  notifications.show({
+    title: "客户端警告",
+    color: "yellow.7",
+    icon: <IconX />,
+    message: Object.values(errors)[0] as React.ReactNode,
+  });
+}
+
+
+/**
+ * 
+ */
+// 将日期字符串转换为指定格式的日期字符串
+export function formatDate(date: Date, format?: string): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  let formattedDate = format
+    ? format.replace("YYYY", String(year))
+            .replace("MM", month)
+            .replace("DD", day)
+            .replace("HH", hours)
+            .replace("mm", minutes)
+    : `${year}-${month}-${day}`;
+
+  if (format && formattedDate.endsWith(":00")) {
+    formattedDate = formattedDate.substring(0, formattedDate.length - 3);
+  }
+
+  return formattedDate;
+}
+

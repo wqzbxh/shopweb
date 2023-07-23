@@ -8,6 +8,7 @@ import {
   IconSettings,
   IconUsers,
   IconLock,
+  IconClock,
   IconClockHour7,
   IconClipboardList,
   IconTruck,
@@ -28,10 +29,13 @@ export const getIconComponent = (iconName: string): React.FC<any> => {
       return IconUsers;
     case "IconSitemap":
       return IconSitemap;
-      case "IconShoppingBag":
-        return IconShoppingBag;
-        case "IconTruck":
-          return IconTruck;
+    case "IconShoppingBag":
+      return IconShoppingBag;
+    case "IconTruck":
+      return IconTruck;
+    case "IconClock":
+      return IconClock;
+
     // 添加更多的组件映射
     default:
       return IconPresentationAnalytics;

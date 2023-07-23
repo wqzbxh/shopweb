@@ -12,10 +12,9 @@ import RichTextEditor from "../../Common/RichTextEditor";
 import { Icon123, IconCategory, IconCheck, IconX } from "@tabler/icons-react";
 import { apiGoodsCategory } from "../../../api";
 import { FormEvent, useState } from "react";
-import { useDisclosure } from "@mantine/hooks";
 import { ApiDataGoodsCategory } from "../../../interface/IgoodsCategory";
 import { notifications } from "@mantine/notifications";
-import { Value } from "react-quill";
+
 
 interface CateGoryFromProps {
   goodsCategoryItemData: ApiDataGoodsCategory;

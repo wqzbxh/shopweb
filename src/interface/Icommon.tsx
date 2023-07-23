@@ -7,5 +7,6 @@ export interface ApiResponse {
   
 export interface SelectPullDown {
   value: string,
-  label: string
+  label: string,
+  [key:string]:any
 }

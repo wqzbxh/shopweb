@@ -14,3 +14,14 @@ export interface ISpecification {
     created_at: string;
     updated_at: string;
   }
+
+
+export interface AttributeValue {
+    id: number;
+    attr_value: string;
+}
+export interface Attribute {
+    id: number;
+    attr_name: string;
+    attr: AttributeValue[];
+}

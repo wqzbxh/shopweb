@@ -18,7 +18,6 @@ export  function RoleForm({callback,roleItem,MenuItem,menuIdArr}:IMenuItemProps)
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
   //定义加载器
-  console.log(roleItem,'22')
   const [visible, setVisible] = useState(false);
   const [menuId, setMenuId] = useState<string[]>(menuIdArr);
   const form = useForm<Irole>({

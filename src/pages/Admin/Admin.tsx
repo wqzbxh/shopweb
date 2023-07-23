@@ -10,6 +10,8 @@ import HeaderSearch from "../Headernav/HeaderNav";
 import Home from "../Home/Home";
 import { Left } from "../LeftNav/LeftNav";
 import Login from "../Login/Login";
+import Project from "../TimeMange/Project/Project";
+import TimeTracker from "../TimeMange/TimeSheet/TimeTracker";
 import RoleIndex from "../User/Role/RoleIndex";
 import UserIndex from "../User/User/UserIndex";
 
@@ -72,6 +74,8 @@ function Admin() {
             <Route path="/user" element={<UserIndex/>} > </Route>
             <Route path="/specification" element={<Specification/>} > </Route>
             <Route path="/user_role" element={<RoleIndex/>} > </Route>
+            <Route path="/time_project" element={<Project/>} > </Route>
+                <Route path="/time_sheet" element={<TimeTracker/>} > </Route>
         </Routes>
     </Flex>
       </>

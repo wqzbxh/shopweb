@@ -14,6 +14,8 @@ import UserIndex from './pages/User/User/UserIndex';
 import RoleIndex from './pages/User/Role/RoleIndex';
 import Goods from './pages/Goods/Goods/Goods';
 import Specification from './pages/Goods/Specification/Specification';
+import Project from './pages/TimeMange/Project/Project';
+import TimeTracker from './pages/TimeMange/TimeSheet/TimeTracker';
 
 function App() {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -42,8 +44,10 @@ function App() {
                 <Route path="/goods" element={<Goods/>} > </Route>
                 <Route path="/user" element={<UserIndex/>} > </Route>
                 <Route path="/user_role" element={<RoleIndex/>} > </Route>
-            <Route path="/specification" element={<Specification/>} > </Route>
+               <Route path="/specification" element={<Specification/>} > </Route>
                <Route path="/goods_catregory" element={<GoodGategory/>} > </Route>
+                <Route path="/time_project" element={<Project/>} > </Route>
+                <Route path="/time_sheet" element={<TimeTracker/>} > </Route>
             </Route>
           </Routes>
         </BrowserRouter> </ModalsProvider>

@@ -131,7 +131,6 @@ export default function GoodsForm({ goodsCategory, goodsTypeSelect }: GoodsFormP
             }
           />
 
-
           <Grid>
             <Grid.Col span={7}>  <TextInput
               label="商品名称"

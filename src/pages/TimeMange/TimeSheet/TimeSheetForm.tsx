@@ -9,7 +9,7 @@ import { SelectPullDown } from "../../../interface/Icommon";
 import { EventData } from "../../../interface/ItimeTracker";
 import { ClientWarningHint, HintInfo } from "../../../utils/function";
 import RichTextEditor from "../../Common/RichTextEditor";
-
+import { calculateTime, calculateTimeInterval, TimeHHSS } from "../../../utils/Time";
 
 
 interface ITimeSheet {
@@ -17,13 +17,16 @@ interface ITimeSheet {
     timeProjectSelect: SelectPullDown[];
     callback: (value: any) => void;
   }
+
+
 export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeSheet) {
     
+
+    const [updateTime, setUpdateTime] = useState(false);
     //定义加载器
     const [visible, setVisible] = useState(false);
-    
+    const [projectid,setProject] = useState<number>(0)
     const ref = useRef<HTMLInputElement>();
-    console.log(Data)
     const form = useForm({
         initialValues: {
           id:Data.id,
@@ -60,23 +63,45 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
         console.log(value);
       }
       useEffect(() => {
-        console.log(123)
-        form.setFieldValue('time_project_id', Data.time_project_id);
-    }, [Data]);
+        setProject(projectid+1)
+    }, [Data.time_project_id,timeProjectSelect]);
 
+    useEffect(() => {
+      const timeDiff = calculateTimeInterval(form.values.start_time, form.values.end_time);
+      console.log(timeDiff, 55);
+  
+      // 检查时间间隔是否有更新，只有当时间间隔值发生变化时才更新 form 的值
+      if (form.values.time !== timeDiff) {
+        form.setFieldValue('time', timeDiff);
+      }
+    }, []);
+    console.log(Data.start,222)
+
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+      const value = TimeHHSS(event);
+      
+      
+    const [startTime, endTime] = calculateTime(value);
+    console.log("开始时间：", startTime);
+    console.log("结束时间：", endTime);
+    form.setFieldValue('start_time',startTime);
+    form.setFieldValue('end_time', endTime);
+  
+      form.setFieldValue("time", value);
+  };
       return (
         <Box component="form" mx="auto" mih={450} onSubmit={handleFormSubmit}>
              <Grid>
-             {/* <Code block mt={5}>
+             <Code block mt={5}>
         {JSON.stringify(form.values, null, 2)}
-      </Code> */}
+      </Code>
             <Grid.Col span={4}>
             <Select
               label="选择项目"
               searchable
               data={timeProjectSelect}
               nothingFound="No options"
-              key={form.values.time_project_id}
+              key={projectid}
               onChange={(value) => form.setFieldValue('time_project_id', value as string)}
               defaultValue={form.values.time_project_id as string}
             
@@ -97,9 +122,11 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
              </Grid>
              <Grid>
             <Grid.Col span={4}>
-                <TimeInput
+                <TextInput
                 label="时间花销" description='输入后，结束时间则为当前时间'  placeholder="输入……"
-                {...form.getInputProps('time')} 
+                 onBlur={handleBlur}
+                value={form.values.time}
+                onChange={(event) => form.setFieldValue('time', event.target.value)}
                 mx="auto"
               />
             </Grid.Col>

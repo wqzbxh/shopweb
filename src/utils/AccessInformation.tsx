@@ -27,7 +27,7 @@ export const getAllTimeTracker= async (select:any) =>
     const TimeTrackerResponese = await apiTimeTracker(select, "GET");
     if(TimeTrackerResponese.data.code==200){
         const timeTrackProject =  TimeTrackerResponese.data.data.map((item:any,index:any)=>{
-            return { value:item.id as string, label:item.name,  }
+            return { value:item.id.toString(), label:item.name,  }
         })
         return timeTrackProject;
     }

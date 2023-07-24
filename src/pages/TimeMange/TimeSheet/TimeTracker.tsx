@@ -66,14 +66,12 @@ const TimeTracker = () => {
   // 定义表单标题
   const [formTitle, setFormTitle] = useState("");
   const handleEventClick = async (event:any) => {
+    SetDataRow(event);
     // 在这里处理事件点击逻辑
-    console.log(event)
+    openTimeSheetForm();
     setFormTitle('修改时间记录');
     const timeTrackProjectOption =  await getAllTimeTracker({type:'select'});
-    console.log(timeTrackProjectOption)
     settimeProjectSelect(timeTrackProjectOption);
-    openTimeSheetForm();
-    SetDataRow(event);
   };
   // 表单操作后的回调
   const callbackHandle=()=>{
@@ -81,11 +79,16 @@ const TimeTracker = () => {
     closeTimeSheetForm();
   }
 
-
+ const  ajaxInit = async()=>{
+    const timeTrackProjectOption =  await getAllTimeTracker({type:'select'});
+    settimeProjectSelect(timeTrackProjectOption);
+  }
+  useEffect(()=>{
+    ajaxInit()
+  },[])
   const handleSelectSlot = async (slotInfo: any) => {
     // 在控制台上打印所选的时间段信息
     SetDataRow({  title: '',   time_project_id:'',   id: '',      start: slotInfo.start,      end: slotInfo.end,      time: '',      sourceResource: '',  });
-    
     const timeTrackProjectOption =  await getAllTimeTracker({type:'select'});
     settimeProjectSelect(timeTrackProjectOption);
     openTimeSheetForm();
@@ -127,6 +130,7 @@ const TimeTracker = () => {
       
        <Modal closeOnClickOutside={false} opened={TimeSheetFormStatus} size='xl' onClose={closeTimeSheetForm}  title={<Text fw={700}>{formTitle}</Text>}>
            <TimeSheetForm  callback={callbackHandle} Data={DataRow}  timeProjectSelect={timeProjectSelect}/>
+           {/* <TimeSheetForm  callback={callbackHandle} Data={DataRow} /> */}
       </Modal>
  </Box>
   );

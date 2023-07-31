@@ -1,4 +1,4 @@
-import { apiGoodsCategory, apiGoodsType, apiTimeTracker, apiUserRole } from "../api";
+import { apiGoodsCategory, apiGoodsType, apiTimeTracker, apiUserList, apiUserRole } from "../api";
 import { ApiResponse } from "../interface/Icommon";
 
 /***
@@ -34,7 +34,17 @@ export const getAllTimeTracker= async (select:any) =>
     return [];
 }
 
-
+export const getUserListSelect = async (select:any) =>
+{
+    const UserResponese = await apiUserList(select, "GET");
+    if(UserResponese.data.code==200){
+        const userList =  UserResponese.data.data.map((item:any,index:any)=>{
+            return { value:item.id.toString(), label:item.name,email:item.email,  }
+        })
+        return userList;
+    }
+    return [];
+}
 
 /**
  * 获取商品规格类型

@@ -37,19 +37,19 @@ function Admin() {
     const links = [
         {
           "link": "/about",
-          "label": "Features"
+          "label": "关于我们"
         },
         {
           "link": "/pricing",
-          "label": "Pricing"
+          "label": "价格"
         },
         {
           "link": "/learn",
-          "label": "Learn"
+          "label": "学习"
         },
         {
           "link": "/community",
-          "label": "Community"
+          "label": "联系方式"
         }
       ]
   return (

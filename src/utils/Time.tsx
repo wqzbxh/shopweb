@@ -1,3 +1,5 @@
+import { HintInfoClien } from "./function";
+
 // 定义输入参数类型
 type DateString = string;
 
@@ -17,7 +19,10 @@ export function calculateTimeInterval(startTime: DateString, endTime: DateString
     // 转换为小时和分钟
     const hours = Math.floor(timeDifference / (1000 * 60 * 60)).toString().padStart(2, '0');
     const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-  
+    // if(hours>'24'){
+    //   HintInfoClien({color:'yellow',msg:'时间已超出24小时，自动归置为23:59'});
+    //   return '23:59';
+    // }
     // 格式化为字符串
     const timeInterval = `${hours}:${minutes}`;
   

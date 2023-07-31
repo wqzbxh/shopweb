@@ -141,7 +141,7 @@ export default function GoodsForm({ goodsCategory, goodsTypeSelect }: GoodsFormP
           </Grid>
 
           <Grid>
-            <Grid.Col span={7}>   <Select
+            <Grid.Col span={7}><Select
               label="商品类型"
               placeholder="选择一种商品类型"
               searchable

@@ -118,6 +118,8 @@ const UserIndex = () => {
 
     // 打开添加类型模态框
   const openUserFormHandler =  async (value: string) => {
+    setFormTitle("新建用户");
+    openUserForm()
       if (value == "create")
       SetUserItem({
           id: "",
@@ -132,8 +134,7 @@ const UserIndex = () => {
         });
       const RoleSeletOption =  await getAllRoleSelect({type:'select'});
       setRoleSelect(RoleSeletOption.data)
-      setFormTitle("新建用户");
-      openUserForm()
+  
     };
 // 表单操作后的回调
   const callbackHandle=()=>{

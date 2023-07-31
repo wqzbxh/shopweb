@@ -57,9 +57,9 @@ function Login() {
   const [reSentEmail, SetSentEmail] = useState(false);
   const form = useForm({
     initialValues: {
-      email: "wqzbxh@163.com",
+      email: "",
       name: "",
-      password: "admin123",
+      password: "",
       login_ldap:false,
       terms: true,
     },

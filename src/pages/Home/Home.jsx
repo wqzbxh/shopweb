@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
-import { createStyles, UnstyledButton, Text, Paper, Group, rem } from '@mantine/core';
+import { createStyles, UnstyledButton, Text, Paper, Group, rem, Box } from '@mantine/core';
 import {
   IconSwimming,
   IconBike,
@@ -148,28 +148,8 @@ export default function Home() {
   ));
 
   return (
-    <div className={classes.root}>
-      <div className={classes.controls}>
-        <UnstyledButton
-          className={classes.control}
-          onClick={() => setDate((current) => dayjs(current).add(1, 'day').toDate())}
-        >
-          <IconChevronUp size="1rem" className={classes.controlIcon} stroke={1.5} />
-        </UnstyledButton>
-
-        <div className={classes.date}>
-          <Text className={classes.day}>{dayjs(date).format('DD')}</Text>
-          <Text className={classes.month}>{dayjs(date).format('MMMM')}</Text>
-        </div>
-
-        <UnstyledButton
-          className={classes.control}
-          onClick={() => setDate((current) => dayjs(current).subtract(1, 'day').toDate())}
-        >
-          <IconChevronDown size="1rem" className={classes.controlIcon} stroke={1.5} />
-        </UnstyledButton>
-      </div>
-      <Group sx={{ flex: 1 }}>{stats}</Group>
-    </div>
+    <Box className='text-center' m={20}>
+        <Text c='#666' size={20} fw={500}>天上月，人间月，负笈求学肩上月，登高凭栏眼中月，竹篮打水碎又圆。山间风，水边风，御剑远游脚下风，圣贤书斋翻书风，风吹浮萍有相逢</Text>
+    </Box>
   );
 }

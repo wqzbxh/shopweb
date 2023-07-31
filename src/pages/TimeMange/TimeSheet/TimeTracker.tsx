@@ -11,6 +11,7 @@ import { EventData } from '../../../interface/ItimeTracker';
 import { CalendarProps } from '@mantine/dates';
 import { getAllTimeTracker } from '../../../utils/AccessInformation';
 import { SelectPullDown } from '../../../interface/Icommon';
+import { apiTimeTrackerAction } from '../../../api';
 moment.locale('zh-cn');
 const localizer = momentLocalizer(moment);
 
@@ -51,6 +52,8 @@ const TimeTracker = () => {
   const dark = colorScheme === 'dark';
   
   const [timeProjectSelect, settimeProjectSelect] = useState<SelectPullDown[]>([]);
+  
+  const [events, setTimetrackerSelect] = useState<any[]>([]);
   // 打开时间编辑添加框
   const [TimeSheetFormStatus, {open:openTimeSheetForm,close:closeTimeSheetForm}] = useDisclosure(false);
   // 数据信息
@@ -59,10 +62,12 @@ const TimeTracker = () => {
     id: '',
     start: '',
     end: '',
+    time_mark:'',
     time: '',
     time_project_id:'',
     sourceResource: '',
 });
+
   // 定义表单标题
   const [formTitle, setFormTitle] = useState("");
   const handleEventClick = async (event:any) => {
@@ -71,29 +76,40 @@ const TimeTracker = () => {
     openTimeSheetForm();
     setFormTitle('修改时间记录');
     const timeTrackProjectOption =  await getAllTimeTracker({type:'select'});
+    console.log(timeTrackProjectOption,2222)
     settimeProjectSelect(timeTrackProjectOption);
   };
   // 表单操作后的回调
   const callbackHandle=()=>{
-    // ajaxGetData();
+    ajaxInit();
     closeTimeSheetForm();
   }
 
  const  ajaxInit = async()=>{
-    const timeTrackProjectOption =  await getAllTimeTracker({type:'select'});
-    settimeProjectSelect(timeTrackProjectOption);
+  //发送请求
+  const timeTrackOption =  await apiTimeTrackerAction({type:'list'});
+    if(timeTrackOption.data.code === 200){
+      const TestData = timeTrackOption.data.data as EventData[];
+       // 格式化数据中的 start 、end 字段为 ISO 8601 格式的字符串
+      const  formattedData  = TestData.map(({ start, end, ...item }) => ({
+        start: new Date(Date.parse(start)),
+        end: new Date(Date.parse(end)),
+        ...item
+      }));
+      setTimetrackerSelect(formattedData )
+    }
   }
   useEffect(()=>{
-    ajaxInit()
+    ajaxInit();
   },[])
   const handleSelectSlot = async (slotInfo: any) => {
-    // 在控制台上打印所选的时间段信息
-    SetDataRow({  title: '',   time_project_id:'',   id: '',      start: slotInfo.start,      end: slotInfo.end,      time: '',      sourceResource: '',  });
+    openTimeSheetForm();
+    SetDataRow({  title: '',  time_mark:'', time_project_id:'',   id: '',      start: slotInfo.start,      end: slotInfo.end,      time: '',      sourceResource: '',  });
     const timeTrackProjectOption =  await getAllTimeTracker({type:'select'});
     settimeProjectSelect(timeTrackProjectOption);
-    openTimeSheetForm();
-    console.log('选择的时间段信息:', slotInfo);
 
+    console.log('选择的时间段信息:', slotInfo);
+    
   };
 
   return (

@@ -5,28 +5,29 @@ import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import { FormEvent, useState } from "react";
 import { apiTimeTracker } from "../../../api";
+import { IProject } from "../../../interface/ItimeProject";
 import { ClientWarningHint, formatDate, HintInfo } from "../../../utils/function";
 
 
 
 interface IProjectForm {
-    // infoItem: Iuser;
+    projectItem: IProject;
     // RoleSelect: SelectPullDown[];
     callback: (value: any) => void;
   }
-export default function ProjectForm({callback}:IProjectForm) {
+export default function ProjectForm({callback,projectItem}:IProjectForm) {
     
     //定义加载器
     const [visible, setVisible] = useState(false);
     const form = useForm({
         initialValues: {
-          id:"",
-          info:'',
-          name: '',
-          project_no: '',
-          start_date: new Date(),
-          time_estimate:'00:00',
-          customer_name: '',
+          id:projectItem.id,
+          info:projectItem.info,
+          name: projectItem.name,
+          project_no:projectItem.project_no,
+          start_date: projectItem.start_date?new Date(projectItem.start_date):new Date(),
+          time_estimate:projectItem.time_estimate,
+          customer_name: projectItem.customer_name,
         },
         validate: {
           name: hasLength({ min: 1, max: 45 }, '项目长度：1个字符到45个字符之间（文字1-15个）'),
@@ -62,7 +63,6 @@ export default function ProjectForm({callback}:IProjectForm) {
         const result = response.data;
         if(HintInfo(result)) callback(true);
       };
-
 
       return (
         <Box component="form" mx="auto" onSubmit={handleFormSubmit}>

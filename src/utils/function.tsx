@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconAlertSquareRounded, IconCheck, IconX } from "@tabler/icons-react";
 import { data } from "../pages/Goods/Category/makeData";
 
 // 删除提示
@@ -42,6 +42,15 @@ export const HintInfo=(result: { code: number; msg: any; })=>{
 }
 
 
+// 请求成功/失败 提示
+export const HintInfoClien=(result: { color: string; msg: any; })=>{
+    notifications.show({
+      color: result.color,
+      icon: <IconAlertSquareRounded />,
+      message: result.msg,
+    });
+}
+
 // 客户端警告  客户端警告
 export const ClientWarningHint =(errors:any)=>{
   notifications.show({
@@ -56,13 +65,14 @@ export const ClientWarningHint =(errors:any)=>{
 /**
  * 
  */
-// 将日期字符串转换为指定格式的日期字符串
+// 将日期字符串转换为指定格式的日期字符串（包括秒数）
 export function formatDate(date: Date, format?: string): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
 
   let formattedDate = format
     ? format.replace("YYYY", String(year))
@@ -70,7 +80,8 @@ export function formatDate(date: Date, format?: string): string {
             .replace("DD", day)
             .replace("HH", hours)
             .replace("mm", minutes)
-    : `${year}-${month}-${day}`;
+            .replace("ss", seconds)
+    : `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
   if (format && formattedDate.endsWith(":00")) {
     formattedDate = formattedDate.substring(0, formattedDate.length - 3);

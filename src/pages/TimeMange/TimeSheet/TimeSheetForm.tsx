@@ -1,13 +1,13 @@
-import { ActionIcon, Box, Button, Code, Grid, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
+import { ActionIcon, Box, Button, Code, Grid, Group, NumberInput, Select, Text, Textarea, TextInput } from "@mantine/core";
 import { DateInput, DateTimePicker, TimeInput } from "@mantine/dates";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconClock, IconX } from "@tabler/icons-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { apiTimeTracker } from "../../../api";
+import { apiTimeTracker, apiTimeTrackerAction } from "../../../api";
 import { SelectPullDown } from "../../../interface/Icommon";
 import { EventData } from "../../../interface/ItimeTracker";
-import { ClientWarningHint, HintInfo } from "../../../utils/function";
+import { ClientWarningHint, DaleteData, formatDate, HintInfo } from "../../../utils/function";
 import RichTextEditor from "../../Common/RichTextEditor";
 import { calculateTime, calculateTimeInterval, TimeHHSS } from "../../../utils/Time";
 
@@ -30,7 +30,8 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
     const form = useForm({
         initialValues: {
           id:Data.id,
-          time_mark:Data.title,
+          title:Data.title.split('@')[1],
+          time_mark:Data.time_mark,
           start_time: Data.start,
           time_project_id:Data.time_project_id,
           end_time: Data.end,
@@ -50,10 +51,22 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
           ClientWarningHint(valid.errors)
           return;
         }
+        const formattedDate = formatDate(new Date(form.values.start_time), "YYYY-MM-DD HH:mm:ss");
+        const formatendDate = formatDate(new Date(form.values.end_time), "YYYY-MM-DD HH:mm:ss");
+        const  originData = {
+          id:form.values.id,
+          time_mark:form.values.time_mark,
+          start_time: formattedDate,
+          title:form.values.title,
+          time_project_id:form.values.time_project_id,
+          end_time:formatendDate,
+          time:form.values.time,
+        }
         let response;
-        const method = form.values.id ? "PUT" : "POST";
+        const method = form.values.id !='' ? "PUT" : "POST";
+        
         setVisible(true);
-        response = await apiTimeTracker(form.values, method);
+        response = await apiTimeTrackerAction(originData, method);
         setVisible(false);
         const result = response.data;
         if(HintInfo(result)) callback(true);
@@ -61,6 +74,8 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
         console.log(Data.time_project_id)
       function RichTextEditorCallBack(value: string): void {
         console.log(value);
+        
+        form.setFieldValue('time_mark', value);
       }
       useEffect(() => {
         setProject(projectid+1)
@@ -74,36 +89,29 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
       if (form.values.time !== timeDiff) {
         form.setFieldValue('time', timeDiff);
       }
-    }, []);
-    console.log(Data.start,222)
+    }, [form.values.start_time, form.values.end_time]);
 
-    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-      const value = TimeHHSS(event);
-      
-      
-    const [startTime, endTime] = calculateTime(value);
-    console.log("开始时间：", startTime);
-    console.log("结束时间：", endTime);
-    form.setFieldValue('start_time',startTime);
-    form.setFieldValue('end_time', endTime);
-  
-      form.setFieldValue("time", value);
-  };
+
+    const handleDeleteRow = (id: string) => {
+      const Info = <Text size='md' color='dark'>删除ID:{id}此条记录</Text>;
+      DaleteData(Info, async () => {    // 调用异步请求的逻辑
+        const response = await apiTimeTrackerAction({id:id}, "DELETE");
+        const result = response.data; // 返回请求结果
+        if(HintInfo(result))callback(true);;
+      });
+    };
       return (
         <Box component="form" mx="auto" mih={450} onSubmit={handleFormSubmit}>
              <Grid>
-             <Code block mt={5}>
-        {JSON.stringify(form.values, null, 2)}
-      </Code>
             <Grid.Col span={4}>
             <Select
               label="选择项目"
               searchable
               data={timeProjectSelect}
               nothingFound="No options"
-              key={projectid}
+              key={form.values.time_project_id}
               onChange={(value) => form.setFieldValue('time_project_id', value as string)}
-              defaultValue={form.values.time_project_id as string}
+              defaultValue={form.values.time_project_id.toString()}
             
             />
             </Grid.Col>
@@ -124,7 +132,7 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
             <Grid.Col span={4}>
                 <TextInput
                 label="时间花销" description='输入后，结束时间则为当前时间'  placeholder="输入……"
-                 onBlur={handleBlur}
+                 disabled
                 value={form.values.time}
                 onChange={(event) => form.setFieldValue('time', event.target.value)}
                 mx="auto"
@@ -143,12 +151,25 @@ export default function TimeSheetForm({callback,Data,timeProjectSelect}:ITimeShe
                  />
             </Grid.Col>
              </Grid> 
-                
-
-          <RichTextEditor content="" callBack={RichTextEditorCallBack} />
+              
+             <Grid>
+            <Grid.Col span={4}>
+                  <Textarea
+                  label="任务信息"
+                  autosize
+                  minRows={2}
+                  {...form.getInputProps("title")}
+                  maxRows={4}
+                />
+                  </Grid.Col>
+          
+             </Grid> 
+              
+          <RichTextEditor title='附属信息（选填）' content={form.values.time_mark} callBack={RichTextEditorCallBack} />
   
           <Group position="right" mt={30}>
-            <Button type="submit">保存</Button>
+              {form.values.id !='' ?  <Button onClick={() =>handleDeleteRow(form.values.id )} color='red'>删除</Button> : null}
+              <Button type="submit">保存</Button> 
           </Group>
         </Box>
       );

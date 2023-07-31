@@ -35,7 +35,7 @@ const modules = {
     ],
   },
 };
-export default function RichTextEditor({ content,callBack }: RichTextEditor) {
+export default function RichTextEditor({ title,content,callBack }: RichTextEditor) {
  
 // 接收值并且传出上一级
   const descHandler =(value:string)=>{
@@ -43,7 +43,7 @@ export default function RichTextEditor({ content,callBack }: RichTextEditor) {
   }
   return (
     <Box  mih={400} mt={10}>
-      <Text fw={500} size='sm'>描述</Text>
+      <Text fw={500} size='sm'>{title?title:'描述'}</Text>
       <ReactQuill
         className="publish-quill"
         placeholder="请输入容"

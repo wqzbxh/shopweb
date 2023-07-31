@@ -36,6 +36,7 @@ export const apiGoodsType= (data,method) => ajax(Host+'goods_type',data,method,f
 // 商品规格类型属性参数
 export const apiGoodsTypeAttribute= (data,method) => ajax(Host+'goods_type_attribute',data,method,false)
 
-
 export const apiTimeTracker= (data,method) => ajax(Host+'time_project',data,method,false)
+
+export const apiTimeTrackerAction= (data,method) => ajax(Host+'timetracker',data,method,false)
 
